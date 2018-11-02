@@ -13,7 +13,7 @@ RUN apt-add-repository ppa:brightbox/ruby-ng
 RUN apt-get update
 RUN apt-get upgrade -y
 
-RUN apt-get install -y git binutils make ruby2.3 ruby2.3-dev ruby-switch dpkg-dev libpcre3-dev libssl-dev curl
+RUN apt-get install -y git binutils make ruby2.3 ruby2.3-dev ruby-switch dpkg-dev libpcre3-dev libssl-dev libgeoip-dev curl
 
 # Add in any extra modules we want. Note that headers_more and mod_echo is already bundled with nginx
 RUN mkdir /tmp/mod_zip
@@ -43,6 +43,7 @@ RUN ./configure --with-pcre-jit --with-http_v2_module --prefix=/usr/local/nginx 
   --with-http_ssl_module --with-http_stub_status_module \
   --add-module=/tmp/mod_zip \
   --add-module=/tmp/ngx_brotli \
+  --with-http_geoip_module=dynamic \
   --with-debug
 
 RUN make -j$processors
@@ -53,7 +54,6 @@ WORKDIR /
 # Got to do a bit of cleanup, nginx build doesn't put stuff in exactly the right place.
 RUN mkdir -p /tmp/fpm/usr/share/nginx
 RUN mv /tmp/fpm/usr/local/nginx/html /tmp/fpm/usr/share/nginx
-RUN rmdir /tmp/fpm/usr/local/nginx
 
 ADD files /tmp/fpm
 
